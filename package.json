@@ -23,6 +23,7 @@
     "@mastra/loggers": "^0.10.3",
     "@mastra/memory": "^0.11.3",
     "@types/nodemailer": "^6.4.17",
+    "dotenv": "^17.2.0",
     "nodemailer": "^7.0.5",
     "zod": "^3.25.76"
   },

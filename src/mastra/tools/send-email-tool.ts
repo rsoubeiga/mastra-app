@@ -1,6 +1,7 @@
 import nodemailer from "nodemailer";
 import { createTool } from "@mastra/core";
 import z from "zod";
+import { config } from "../../config";
 
 export const sendEmailTool = createTool({
     id: "send-email",
@@ -19,14 +20,14 @@ export const sendEmailTool = createTool({
         const { summary, to } = context;
 
         let transporter = nodemailer.createTransport({
-            service: process.env.EMAIL_SERVICE,
+            service: config.email.service,
             auth: {
-                user: process.env.EMAIL_USER,
-                pass: process.env.EMAIL_PASS,
+                user: config.email.user,
+                pass: config.email.pass,
             }
         });
         await transporter.sendMail({
-            from: process.env.EMAIL_USER,
+            from: config.email.user,
             to: to,
             subject: "Rapport de veille - " + new Date().toLocaleDateString(),
             html: summary

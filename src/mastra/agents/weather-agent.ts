@@ -3,6 +3,7 @@ import { Agent } from '@mastra/core/agent';
 import { Memory } from '@mastra/memory';
 import { LibSQLStore } from '@mastra/libsql';
 import { weatherTool } from '../tools/weather-tool';
+import { config } from '../../config';
 
 export const weatherAgent = new Agent({
   name: 'Weather Agent',
@@ -20,11 +21,11 @@ export const weatherAgent = new Agent({
 
       Use the weatherTool to fetch current weather data.
 `,
-  model: google('gemini-2.5-pro'),
+  model: google(config.llm.model),
   tools: { weatherTool },
   memory: new Memory({
     storage: new LibSQLStore({
-      url: 'file:../mastra.db', // path is relative to the .mastra/output directory
+      url: config.database.url, // path is relative to the .mastra/output directory
     }),
   }),
 });

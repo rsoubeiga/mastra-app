@@ -1,6 +1,7 @@
 // src/mastra/tools/serpstack-tool.ts
 import { createTool } from "@mastra/core/tools";
 import { z } from "zod";
+import { config } from "../../config";
 
 export const webSearchTool = createTool({
   id: "web-search",
@@ -16,7 +17,7 @@ export const webSearchTool = createTool({
   })),
   execute: async ({ context }) => {
     const { query, numResults = 5 } = context;
-    const apiKey = process.env.SERPSTACK_ACCESS_KEY;
+    const apiKey = config.serpstack.apiKey;
     const params = new URLSearchParams({
       access_key: apiKey ?? "",
       query: query,
