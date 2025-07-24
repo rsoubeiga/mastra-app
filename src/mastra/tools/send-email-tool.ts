@@ -29,7 +29,7 @@ export const sendEmailTool = createTool({
             from: process.env.EMAIL_USER,
             to: to,
             subject: "Rapport de veille - " + new Date().toLocaleDateString(),
-            text: summary,
+            html: summary
         });
         return { success: true };
     },
