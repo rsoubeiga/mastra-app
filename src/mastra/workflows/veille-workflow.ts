@@ -9,16 +9,14 @@ const searchStep = createStep({
     description:  'Search the web for the given topic.',
     inputSchema: z.object({
         query: z.string().describe("Topic or search query"),
-        numResults: z.number().optional().describe("Number of results to retrieve"),
-        to: z.string().describe("Email address to send the summary to")
+        numResults: z.number().optional().describe("Number of results to retrieve")
     }),
     outputSchema: z.object({
         results: z.array(z.object({
             title: z.string(),
             url: z.string().url(),
             snippet: z.string().nullable()
-        })),
-        to: z.string().describe("Email address to send the summary to")
+        }))
     }),
     execute: async ({ inputData }) => {
         if (!inputData) {
@@ -26,7 +24,7 @@ const searchStep = createStep({
         }
         const { query, numResults = 5 } = inputData;
         const response = await webSearchTool.execute({ context: { query, numResults }});
-        return { results: response, to: inputData.to };
+        return { results: response };
     },
 });
 
@@ -38,12 +36,10 @@ const summarizeStep = createStep({
             title: z.string(),
             url: z.string().url(),
             snippet: z.string().nullable()
-        })),
-        to: z.string().describe("Email address to send the summary to")
+        }))
     }),
     outputSchema: z.object({
-        summary: z.string(),
-        to: z.string().describe("Email address to send the summary to")
+        summary: z.string()
     }),
     execute: async ({ inputData }) => {
         if (!inputData) {
@@ -61,7 +57,7 @@ const summarizeStep = createStep({
         const { veilleAgent } = await import("../agents/veille-agent");
         const response = await veilleAgent.generate(prompt);
         // response.text is the generated summary
-        return { summary: response.text, to: inputData.to };
+        return { summary: response.text };
     },
 });
 
@@ -75,11 +71,12 @@ const sendEmailStep = createStep({
     outputSchema: z.object({
         success: z.boolean()
     }),
-    execute: async ({ inputData }) => {
+    execute: async ({ inputData, getInitData }) => {
         if (!inputData) {
             throw new Error('Input data not found');
         }
-        const { summary, to } = inputData;
+        const { summary } = inputData;
+        const to = getInitData().to;
         const response = await sendEmailTool.execute({ context: { summary, to }});
         return { success: response.success };
     },
