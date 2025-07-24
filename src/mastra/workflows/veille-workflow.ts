@@ -19,9 +19,7 @@ const searchStep = createStep({
         }))
     }),
     execute: async ({ inputData }) => {
-        if (!inputData) {
-            throw new Error('Input data not found');
-        }
+        
         const { query, numResults = 5 } = inputData;
         const response = await webSearchTool.execute({ context: { query, numResults }});
         return { results: response };
@@ -42,9 +40,7 @@ const summarizeStep = createStep({
         summary: z.string()
     }),
     execute: async ({ inputData }) => {
-        if (!inputData) {
-            throw new Error('Input data not found');
-        }
+        
         const articles = inputData.results;
         // Build the prompt for the LLM
         let prompt = `You are a monitoring agent. Summarize the following information on the requested topic, citing the sources.\n`;
@@ -72,9 +68,7 @@ const sendEmailStep = createStep({
         success: z.boolean()
     }),
     execute: async ({ inputData, getInitData }) => {
-        if (!inputData) {
-            throw new Error('Input data not found');
-        }
+        
         const { summary } = inputData;
         const to = getInitData().to;
         const response = await sendEmailTool.execute({ context: { summary, to }});
