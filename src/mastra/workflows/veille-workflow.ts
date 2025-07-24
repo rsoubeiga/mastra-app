@@ -2,6 +2,7 @@ import { createStep, createWorkflow } from "@mastra/core";
 import { z } from "zod";
 import { webSearchTool } from "../tools/web-search-tool";
 import { sendEmailTool } from "../tools/send-email-tool";
+import { summarizeTool } from "../tools/summarize-tool";
 
 
 const searchStep = createStep({
@@ -19,7 +20,6 @@ const searchStep = createStep({
         }))
     }),
     execute: async ({ inputData }) => {
-        
         const { query, numResults = 5 } = inputData;
         const response = await webSearchTool.execute({ context: { query, numResults }});
         return { results: response };
@@ -40,20 +40,9 @@ const summarizeStep = createStep({
         summary: z.string()
     }),
     execute: async ({ inputData }) => {
-        
         const articles = inputData.results;
-        // Build the prompt for the LLM
-        let prompt = `You are a monitoring agent. Summarize the following information on the requested topic, citing the sources.\n`;
-        prompt += `Information found:\n`;
-        articles.forEach((art, idx) => {
-            prompt += `[${idx+1}] "${art.title}" - ${art.snippet}\n URL: ${art.url}\n\n`;
-        });
-        prompt += `\nNow write a clear and concise summary (a few paragraphs) of the main findings, mentioning the corresponding sources as [${1}], [${2}], ...\n`;
-        // Call the veille agent via Mastra
-        const { veilleAgent } = await import("../agents/veille-agent");
-        const response = await veilleAgent.generate(prompt);
-        // response.text is the generated summary
-        return { summary: response.text };
+        const response = await summarizeTool.execute({ context: { articles }});
+        return { summary: response.summary };
     },
 });
 
@@ -68,7 +57,6 @@ const sendEmailStep = createStep({
         success: z.boolean()
     }),
     execute: async ({ inputData, getInitData }) => {
-        
         const { summary } = inputData;
         const to = getInitData().to;
         const response = await sendEmailTool.execute({ context: { summary, to }});
