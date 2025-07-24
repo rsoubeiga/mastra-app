@@ -6,13 +6,13 @@ import { weatherWorkflow } from './workflows/weather-workflow';
 import { weatherAgent } from './agents/weather-agent';
 import { githubAgent } from './agents/github-agent';
 import { veilleWorkflow } from './workflows/veille-workflow';
+import { config } from '../config';
 
 export const mastra = new Mastra({
   workflows: { weatherWorkflow, veilleWorkflow },
   agents: { weatherAgent, githubAgent },
   storage: new LibSQLStore({
-    // stores telemetry, evals, ... into memory storage, if it needs to persist, change to file:../mastra.db
-    url: ":memory:",
+    url: config.database.url,
   }),
   logger: new PinoLogger({
     name: 'Mastra',
